@@ -1,4 +1,3 @@
-
 var twit = require('twit');
 var syl = require('syllable');
 var nlp = require('nlp_compromise');
@@ -13,8 +12,10 @@ var t = new twit(config);
 var tweet = {status: 'Test\'s Tweet'};
 t.post('statuses/update', tweet, tweeted);
 
+//callback function for error reporting but that will never happen, I'm the greatest programmer to ever greet the world with a "hello"
 function tweeted(err, data, response){
 	if (err){
+		//yeet
 		console.log("Something went wrong.");
 		console.log(err);
 		console.log(data);
@@ -26,28 +27,34 @@ function tweeted(err, data, response){
 	
 }
 
-// Count all of the links from the nodejs build page
 var jsdom = require('jsdom/lib/old-api');
 var lis;
+//convert URL to DOM
 jsdom.env("https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States",[],
 function(errors, window) {
-  //console.log("there have been", window.$("a").length, "nodejs releases!");
+  //form NodeList of all list elements in the DOM	
   lis = window.document.getElementsByTagName("li");
+  //bool for determining the first li
   var begin = false;
+  //start the iterations!
   console.log("start");
   for(let i = 1; i < lis.length; i++){
   	setTimeout(function() { 
+  		//yeah this is the first result that's actually a company/phrase
   		if (lis[i].textContent == "21st Century Fox"){
   			begin = true;
 	  	}
+	  	//now we've gotten to the real stuff
 	  	if (lis[i].textContent.length >= 2 && begin){
+	  		//the textContent of the list element has the string we want to manipulate and tweet
 	  		console.log(makeFunny(lis[i].textContent));
 	  		t.post('statuses/update', makeFunny(lis[i].textContent), tweeted);
 	  		console.log("----------------------------------");
 	  		if (lis[i].textContent == "Zynga"){
+	  			//4 years and 8 months later
 	  			begin = false;
 	  		}
-	  	} }, i*2000/*86400000*/);
+	  	} }, i*86400000); //once a day
   	
   };
 });
@@ -110,8 +117,8 @@ function makeFunny(s){
 	return res;
 }
 
-//TODO: find and parse a database for companies, movie titles, basically anything copywritten/trademarked?
-//TODO: implement twitter API to publish a tweet of some randomly retrieved makeFunny result
-//TODO: host on heroku for free 
-//TODO: find more weird edge cases
-//TODO: McDonald's monkaS
+//TODO: find and parse a database for companies, movie titles, basically anything copywritten/trademarked? CHECK
+//TODO: implement twitter API to publish a tweet of some randomly retrieved makeFunny result CHECK
+//TODO: host on heroku for free CHECK
+//TODO: find more weird edge cases ... heh about that
+//TODO: McDonald's monkaS ... monkaSHAKE
