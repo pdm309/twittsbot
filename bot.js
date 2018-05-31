@@ -5,12 +5,14 @@ var nlpSyl = require('nlp-syllables');
 nlp.plugin(nlpSyl);
 
 //twitter api setup
-var config = require('config');
+var config = require('./config');
 var t = new twit(config);
 
 //test tweet
-var tweet = {status: 'Test\'s Tweet'};
-t.post('statuses/update', tweet, tweeted);
+//var tweet = {status: 'You\'s Tube'};
+//t.post('statuses/update', tweet, tweeted);
+
+var fs = require('fs');
 
 //callback function for error reporting but that will never happen, I'm the greatest programmer to ever greet the world with a "hello"
 function tweeted(err, data, response){
@@ -27,41 +29,83 @@ function tweeted(err, data, response){
 	
 }
 
+
 var jsdom = require('jsdom/lib/old-api');
 var lis;
+var count = 0;
+var begin = false;
+
 //convert URL to DOM
 jsdom.env("https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States",[],
 function(errors, window) {
   //form NodeList of all list elements in the DOM	
   lis = window.document.getElementsByTagName("li");
   //bool for determining the first li
-  var begin = false;
+  
   //start the iterations!
   console.log("start");
   for(let i = 1; i < lis.length; i++){
-  	setTimeout(function() { 
+  	
+  	//console.log(lis[i].textContent);
+  	//console.log(i);
+  	//console.log("-----------------");
   		//yeah this is the first result that's actually a company/phrase
-  		if (lis[i].textContent == "21st Century Fox"){
+  		if (lis[i].textContent == "24 Hour Fitness"){
   			begin = true;
+  			console.log("i is " + i);
+  			count++;
 	  	}
 	  	//now we've gotten to the real stuff
-	  	if (lis[i].textContent.length >= 2 && begin){
-	  		//the textContent of the list element has the string we want to manipulate and tweet
-	  		console.log(makeFunny(lis[i].textContent));
-	  		t.post('statuses/update', makeFunny(lis[i].textContent), tweeted);
-	  		console.log("----------------------------------");
+	  	if (begin){
 	  		if (lis[i].textContent == "Zynga"){
-	  			//4 years and 8 months later
+	  			
 	  			begin = false;
 	  		}
-	  	} }, i*86400000); //once a day
-  	
-  };
+	  		else {
+	  			sleep(1, function(){    
+			    		//t.post('statuses/update', {status: '' + makeFunny(lis[i].textContent}), tweeted);
+			    		fs.appendFileSync('list.txt', '' + makeFunny(lis[i].textContent + '\n'));
+			    		console.log(makeFunny(lis[i].textContent));
+			  		});
+	  			count++;
+	  		}
+	  }
+	}
 });
 
-function makeFunny(s){
 
-	console.log(s);
+function sleep(time, callback) {
+    var stop = new Date().getTime();
+    while(new Date().getTime() < stop + time) {
+        ;
+    }
+    callback();
+}
+
+/*
+function iterateThroughCompaniesPushingToList(listElement, count){
+		//console.log(makeFunny(listElement.textContent));
+	  	return makeFunny(listElement.textContent);
+}
+*/
+
+
+/*
+while (!begin && count > 40){
+	for (var x = 1; x < tweets.length; x++) {
+			  		setTimeout(function(y) {    
+			    		//t.post('statuses/update', tweet, tweeted);
+			    		//console.log(tweets[x]);
+			  		}, x * 5000, x); // we're passing x
+				}//4 years and 8 months later
+
+}
+*/
+
+
+
+function makeFunny(s){
+	//console.log(s);
 	var res = "";
 	var sArr = s.split(" ");
 
